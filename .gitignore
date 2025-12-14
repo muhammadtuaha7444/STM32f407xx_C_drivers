@@ -1,0 +1,27 @@
+# Build output
+Debug/
+Release/
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.o
+*.d
+*.axf
+
+# IDE settings
+.project
+.settings/
+*.launch
+*.cproject
+.vscode/
+
+# STM32Cube generated files
+*.ioc.backup
+*.log
+
+# Misc
+*.swp
+*.bak
+*.tmp
