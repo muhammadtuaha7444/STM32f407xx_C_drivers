@@ -195,6 +195,10 @@ void GPIO_DeInit(GPIO_RegDef_t *GPIOx)
 uint8_t GPIO_ReadInputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin )
 {
 
+uint8_t value;
+value = (uint8_t) ((GPIOx->IDR >> GPIOPin) & (0x00000001));
+
+return value;
 }
 
 /*******************************************************************************
@@ -207,6 +211,9 @@ uint8_t GPIO_ReadInputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin )
  */
 uint16_t GPIO_ReadInputPort(GPIO_RegDef_t *GPIOx)
 {
+	uint16_t value;
+	value = (uint16_t) (GPIOx->IDR);
+	return value;
 
 }
 
