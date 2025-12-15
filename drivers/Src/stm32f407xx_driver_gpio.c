@@ -21,65 +21,65 @@
  * @ Para[1]  : Enable or Disable Macro
  * @ Note	  :
  */
-void GPIO_ClockCtrl(GPIO_RegDef_t *GPIOx, uint8_t EnDis)
+void GPIO_ClockCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnDis)
 {
 	if(EnDis == EN)
 	{
-		if(GPIOx == GPIOA)
+		if(pGPIOx == GPIOA)
 		{
 			GPIOA_PCLK_EN();
-		}else if(GPIOx == GPIOB)
+		}else if(pGPIOx == GPIOB)
 		{
 			GPIOB_PCLK_EN();
-		}else if(GPIOx == GPIOC)
+		}else if(pGPIOx == GPIOC)
 		{
 			GPIOC_PCLK_EN();
-		}else if(GPIOx == GPIOD)
+		}else if(pGPIOx == GPIOD)
 		{
 			GPIOD_PCLK_EN();
-		}else if(GPIOx == GPIOE)
+		}else if(pGPIOx == GPIOE)
 		{
 			GPIOE_PCLK_EN();
-		}else if(GPIOx == GPIOF)
+		}else if(pGPIOx == GPIOF)
 		{
 			GPIOF_PCLK_EN();
-		}else if(GPIOx == GPIOG)
+		}else if(pGPIOx == GPIOG)
 		{
 			GPIOG_PCLK_EN();
-		}else if(GPIOx == GPIOH)
+		}else if(pGPIOx == GPIOH)
 		{
 			GPIOH_PCLK_EN();
-		}else if(GPIOx == GPIOI)
+		}else if(pGPIOx == GPIOI)
 		{
 			GPIOI_PCLK_EN();
 		}
 	}else
 	{
-		if(GPIOx == GPIOA)
+		if(pGPIOx == GPIOA)
 		{
 			GPIOA_PCLK_DI();
-		}else if(GPIOx == GPIOB)
+		}else if(pGPIOx == GPIOB)
 		{
 			GPIOB_PCLK_DI();
-		}else if(GPIOx == GPIOC)
+		}else if(pGPIOx == GPIOC)
 		{
 			GPIOC_PCLK_DI();
-		}else if(GPIOx == GPIOD)
+		}else if(pGPIOx == GPIOD)
 		{
 			GPIOD_PCLK_DI();
-		}else if(GPIOx == GPIOE)
+		}else if(pGPIOx == GPIOE)
 		{
 			GPIOE_PCLK_DI();
-		}else if(GPIOx == GPIOF)
+		}else if(pGPIOx == GPIOF)
 		{
 			GPIOF_PCLK_DI();
-		}else if(GPIOx == GPIOG)
+		}else if(pGPIOx == GPIOG)
 		{
 			GPIOG_PCLK_DI();
-		}else if(GPIOx == GPIOH)
+		}else if(pGPIOx == GPIOH)
 		{
 			GPIOH_PCLK_DI();
-		}else if(GPIOx == GPIOI)
+		}else if(pGPIOx == GPIOI)
 		{
 			GPIOI_PCLK_DI();
 		}
@@ -150,34 +150,34 @@ void GPIO_Init(GPIO_Handler_t *pGPIO_Handle)
  * @ Para[1]  : Pointer to GPIO Register Defination struct(GPIO base address)
  * @ Note	  :
  */
-void GPIO_DeInit(GPIO_RegDef_t *GPIOx)
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
 {
 
-	if(GPIOx == GPIOA)
+	if(pGPIOx == GPIOA)
 	{
 		GPIOA_RESET();
-	}else if(GPIOx == GPIOB)
+	}else if(pGPIOx == GPIOB)
 	{
 		GPIOB_RESET();
-	}else if(GPIOx == GPIOC)
+	}else if(pGPIOx == GPIOC)
 	{
 		GPIOC_RESET();
-	}else if(GPIOx == GPIOD)
+	}else if(pGPIOx == GPIOD)
 	{
 		GPIOD_RESET();
-	}else if(GPIOx == GPIOE)
+	}else if(pGPIOx == GPIOE)
 	{
 		GPIOE_RESET();
-	}else if(GPIOx == GPIOF)
+	}else if(pGPIOx == GPIOF)
 	{
 		GPIOF_RESET();
-	}else if(GPIOx == GPIOG)
+	}else if(pGPIOx == GPIOG)
 	{
 		GPIOG_RESET();
-	}else if(GPIOx == GPIOH)
+	}else if(pGPIOx == GPIOH)
 	{
 		GPIOH_RESET();
-	}else if(GPIOx == GPIOI)
+	}else if(pGPIOx == GPIOI)
 	{
 		GPIOI_RESET();
 	}
@@ -192,14 +192,6 @@ void GPIO_DeInit(GPIO_RegDef_t *GPIOx)
  * @ Para[1]  :
  * @ Note	  :
  */
-uint8_t GPIO_ReadInputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin )
-{
-
-uint8_t value;
-value = (uint8_t) ((GPIOx->IDR >> GPIOPin) & (0x00000001));
-
-return value;
-}
 
 /*******************************************************************************
  * @ Function :
@@ -225,8 +217,15 @@ uint16_t GPIO_ReadInputPort(GPIO_RegDef_t *GPIOx)
  * @ Para[1]  :
  * @ Note	  :
  */
-void GPIO_WriteOutputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin, uint8_t Value )
+void GPIO_WriteOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t GPIOPin, uint8_t value )
 {
+if(value == SET)
+{
+	pGPIOx->ODR |= (1 << GPIOPin);
+}else if(value == RESET)
+{
+	pGPIOx->IDR &= ~(1 << GPIOPin);
+}
 
 }
 
@@ -238,8 +237,10 @@ void GPIO_WriteOutputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin, uint8_t Value )
  * @ Para[1]  :
  * @ Note	  :
  */
-void GPIO_WriteOutputPort(GPIO_RegDef_t *GPIOx, uint16_t Value)
+void GPIO_WriteOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t value)
 {
+
+pGPIOx->ODR = value;
 
 }
 
@@ -251,9 +252,10 @@ void GPIO_WriteOutputPort(GPIO_RegDef_t *GPIOx, uint16_t Value)
  * @ Para[1]  :
  * @ Note	  :
  */
-void GPIO_TogglePin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin)
+void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, uint8_t GPIOPin)
 {
 
+pGPIOx->ODR ^= (1 << GPIOPin);
 }
 
 /*******************************************************************************
