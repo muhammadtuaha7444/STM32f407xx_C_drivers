@@ -97,45 +97,48 @@ void GPIO_Init(GPIO_Handler_t *pGPIO_Handle)
 {
 	uint32_t temp = 0;
 	/* GPIOx Mode Configuration of the port*/
-	if (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinMode <= GPIO_AN_MODE)
+	if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode <= GPIO_AN_MODE)
 	{
-		temp = ((pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinMode) << (2 * (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber)));
-		pGPIO_Handle->pGPIOx_Port->MODER &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber); // clearing before setting
+		temp = ((pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode) << (2 * (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber)));
+		pGPIO_Handle->pGPIOx_Port->MODER &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber); // clearing before setting
 		(pGPIO_Handle->pGPIOx_Port->MODER) |= temp; //Setting 
 		temp = 0;
-	}else if (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinMode >> GPIO_AN_MODE)
+	}else if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode >> GPIO_AN_MODE)
 	{
 		//write the IT logic here
 	}
 
 
 	/*Configure the output type of the pin*/
-	temp = (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinODType) << (1 * (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber));
-	pGPIO_Handle->pGPIOx_Port->OTYPER &= ~(1 << pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber); // clearing before setting
-	(pGPIO_Handle->pGPIOx_Port->OTYPER) |= temp;
-	temp = 0;
+	if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_OP_MODE)
+	{
+		temp = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinODType) << (1 * (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+		pGPIO_Handle->pGPIOx_Port->OTYPER &= ~(1 << pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber); // clearing before setting
+		(pGPIO_Handle->pGPIOx_Port->OTYPER) |= temp;
+		temp = 0;
+	}
 
 	/*Configure the pull up or pull down of the pin*/
-	temp = (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinPUPD) << (2 * (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber));
-	pGPIO_Handle->pGPIOx_Port->PUPDR &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber); // clearing before setting
+	temp = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinPUPD) << (2 * (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+	pGPIO_Handle->pGPIOx_Port->PUPDR &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber); // clearing before setting
 	pGPIO_Handle->pGPIOx_Port->PUPDR |= temp;
 	temp = 0;
 
 	/*Configure the Output speed of the pin*/
-	temp = (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinSpeed) << (2 * (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinSpeed));
-	pGPIO_Handle->pGPIOx_Port->OSPEEDR &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber); // clearing before setting
+	temp = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinSpeed) << (2 * (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinSpeed));
+	pGPIO_Handle->pGPIOx_Port->OSPEEDR &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber); // clearing before setting
 	pGPIO_Handle->pGPIOx_Port->OSPEEDR |= temp;
 	temp = 0;
 	
 	/*Configre the alternate pin functionality of the pin*/
-	if(pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinMode == GPIO_AF_MODE)
+	if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_AF_MODE)
 	{
 		uint32_t temp1, temp2;
-		temp1 = (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber) / 8;
-		temp2 = (pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinNumber) %  8;
+		temp1 = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber) / 8;
+		temp2 = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber) %  8;
 
 		pGPIO_Handle->pGPIOx_Port->AFR[temp1] &=  ~(0xF<< (4 * temp2)); 
-		pGPIO_Handle->pGPIOx_Port->AFR[temp1] |=  pGPIO_Handle->pGPIOxConfig_Port->GPIO_PinAF<< (4 * temp2);
+		pGPIO_Handle->pGPIOx_Port->AFR[temp1] |=  pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinAF<< (4 * temp2);
 		temp1 = 0;
 		temp2 = 0;
 	}

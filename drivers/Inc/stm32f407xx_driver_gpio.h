@@ -9,6 +9,7 @@
 #define INC_STM32F407XX_DRIVER_GPIO_H_
 
 #include <stdint.h>
+#include "stm32f407xx.h"
 
 
 
@@ -29,7 +30,7 @@ typedef struct {
 typedef struct
 {
 	GPIO_RegDef_t *pGPIOx_Port;
-	GPIO_Pin_Config_t *pGPIOxConfig_Port;
+	GPIO_Pin_Config_t pGPIOxConfig_Port;
 
 }GPIO_Handler_t;
 
