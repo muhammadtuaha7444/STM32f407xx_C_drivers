@@ -26,5 +26,11 @@ int main()
 	GPIO_ClockCtrl(GPIOD, EN);
 	GPIO_Init(&GPIOled);
 
+	while(1)
+	{
+		delay();
+		GPIO_TogglePin(GPIOD, GPIO_PIN12);
+	}
+
 
 }
