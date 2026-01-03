@@ -103,9 +103,36 @@ void GPIO_Init(GPIO_Handler_t *pGPIO_Handle)
 		pGPIO_Handle->pGPIOx_Port->MODER &= ~(0x3 << pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber); // clearing before setting
 		(pGPIO_Handle->pGPIOx_Port->MODER) |= temp; //Setting 
 		temp = 0;
-	}else if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode >> GPIO_AN_MODE)
+
+
+	}else if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode >> GPIO_AN_MODE) // GPIO Interrupt Logic is here
 	{
-		//write the IT logic here
+		//1. Configure the edge trigger
+		if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_IT_FE)
+		{
+			
+			EXTI->FTSR |= (1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+			EXTI->RTSR &= ~(1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+
+		}else if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_IT_RE)
+		{
+			EXTI->RTSR |= (1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+			EXTI->FTSR &= ~(1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+
+		}else if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_IT_RFE)
+		{
+			EXTI->RTSR |= (1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+			EXTI->FTSR |= (1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
+		}
+		//2. Configure the GPIO port selection in SYS CFGR
+		SYSCFG_PCLK_EN();
+		uint8_t temp1 = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber) / 4;
+		uint8_t temp2 = (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber) % 4;
+		uint8_t gpio_port_code = GPIOPORTCODE(pGPIO_Handle->pGPIOx_Port);
+		SYSCONFIG->EXTICR[temp1] |= gpio_port_code << ( temp2 * 4); 
+
+		//3. Configure the interrupt EXTI interrupt delivery using IMR
+			EXTI->IMR |=  (1 << (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinNumber));
 	}
 
 
@@ -195,7 +222,12 @@ void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
  * @ Para[1]  :
  * @ Note	  :
  */
-
+uint8_t GPIO_ReadInputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin )
+{
+	uint8_t value;
+	value = (uint8_t)((GPIOx->IDR >> GPIOPin) & 0x00000001);
+	return value;
+}
 /*******************************************************************************
  * @ Function :
  * @ Brief    :
@@ -258,7 +290,7 @@ pGPIOx->ODR = value;
 void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, uint8_t GPIOPin)
 {
 
-pGPIOx->ODR ^= (1 << GPIOPin);
+	pGPIOx->ODR ^= (1 << GPIOPin);
 }
 
 /*******************************************************************************
@@ -269,10 +301,49 @@ pGPIOx->ODR ^= (1 << GPIOPin);
  * @ Para[1]  :
  * @ Note	  :
  */
-void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnDis)
+void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t EnDis)
 {
+	if(EnDis == EN)
+	{
+		if(IRQNumber <= 31)
+		{
+			// Set the ICRER0 
+			*NVIC_ISER0_ADDR	|= (1 << IRQNumber );
+		}else if(IRQNumber >= 32 && ( IRQNumber < (2 * 32) ))
+		{
+			// Set the ICRER1 
+			*NVIC_ISER0_ADDR	|= (1 << ( IRQNumber % 32 ) );
+		}else if(IRQNumber >= (2 * 32) && ( IRQNumber < (3 * 32)) )
+		{
+			// Set the ICRER2
+			*NVIC_ISER0_ADDR	|= (1 << ( IRQNumber % (2*32) ) ); 
+		}
+
+		/* todo: Set the other IRQ Enable of needed in other MCU
+		else if(IRQNumber < 31)
+		{
+			// Set the ICRER0 
+		}
+		*/
+	}
 
 
+}
+
+/*******************************************************************************
+ * @ Function :
+ * @ Brief    :
+ * @ Para[1]  :
+ * @ Para[1]  :
+ * @ Para[1]  :
+ * @ Note	  :
+ */
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+	uint8_t IPR_Reg_Select = IRQNumber / 4;
+	uint8_t IRP_Number_Byte_Offset = IRQNumber % 4;
+	uint8_t Shift_Amount =   (IRP_Number_Byte_Offset * 8) + (8 - NVIC_PRIORITY_SHIFT);
+	*(NVIC_IPR_BASE_ADDR + (IPR_Reg_Select * 4)) |= (IRQPriority << Shift_Amount);  
 }
 
 /*******************************************************************************
@@ -285,5 +356,10 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnDis)
  */
 void GPIO_IRQHandler(uint8_t GPIOPin)
 {
+	// Clearing the pending register to stop the IRQ. We have to set it in order to so.
 
+	if(EXTI->PR & (1 << GPIOPin))
+	{
+		EXTI->PR |= (1 << GPIOPin);
+	}
 }

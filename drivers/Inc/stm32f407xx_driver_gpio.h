@@ -24,6 +24,7 @@ typedef struct {
 	uint8_t GPIO_PinODType;				/* !<Defined @GPIO OUTPUT TYPES>  */
 	uint8_t GPIO_PinAF;
 }GPIO_Pin_Config_t;
+
 /*
  * Here we have defined the GPIOx Handler Structure
  */
@@ -101,7 +102,8 @@ uint16_t GPIO_ReadInputPort(GPIO_RegDef_t *GPIOx);
 void GPIO_WriteOutputPin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin, uint8_t Value );
 void GPIO_WriteOutputPort(GPIO_RegDef_t *GPIOx, uint16_t Value);
 void GPIO_TogglePin(GPIO_RegDef_t *GPIOx, uint8_t GPIOPin);
-void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnDis);
+void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t EnDis);
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 void GPIO_IRQHandler(uint8_t GPIOPin);
 
 #endif /* INC_STM32F407XX_DRIVER_GPIO_H_ */

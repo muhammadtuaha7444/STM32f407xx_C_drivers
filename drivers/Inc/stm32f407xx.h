@@ -15,6 +15,50 @@
 #include <stdint.h>
 #include "stm32f407xx.h"
 
+/*
+ * Macro address of the NVIC Peripheral of ARM Cortex F4 Processor
+ * 1. NVIC Base addresses
+ * TODO : Add the remaining peripherals and the regiters
+*/
+
+/*Processor addresses of NVIC Peripheral*/
+#define NVIC_ISER0_ADDR		    ( (volatile uint32_t*)0xE000E100 )
+#define NVIC_ISER1_ADDR		    ( (volatile uint32_t*)0xE000E104 )
+#define NVIC_ISER2_ADDR		    ( (volatile uint32_t*)0xE000E108 )
+#define NVIC_ISER3_ADDR		    ( (volatile uint32_t*)0xE000E10C )
+
+/*Processor addresses of NVIC Peripheral*/
+#define NVIC_ICER0_ADDR		    ( (volatile uint32_t*)0XE000E180 )
+#define NVIC_ICER1_ADDR		    ( (volatile uint32_t*)0XE000E184 )
+#define NVIC_ICER2_ADDR		    ( (volatile uint32_t*)0XE000E188 )
+#define NVIC_ICER3_ADDR		    ( (volatile uint32_t*)0xE000E18C )
+
+/*Processor NVIC Interrupt Priority register base address*/
+#define NVIC_IPR_BASE_ADDR		    ( (volatile uint32_t*)0xE000E400 )
+#define NVIC_PRIORITY_SHIFT				4
+
+/*Priority Number for the Processor Settings*/
+#define PRIORITY_0						0
+#define PRIORITY_1						1
+#define PRIORITY_2						2		
+#define PRIORITY_3						3
+#define PRIORITY_4						4
+#define PRIORITY_5						5
+#define PRIORITY_6						6
+#define PRIORITY_7						7
+#define PRIORITY_8						8
+#define PRIORITY_9						9
+#define PRIORITY_10						10
+#define PRIORITY_11						11
+#define PRIORITY_12						12
+#define PRIORITY_13						13
+#define PRIORITY_14						14
+
+/*
+ * Macro address of the Dicovery MCU Peripheral of ARM Cortex F4 
+ * 1. NVIC Base addresses
+ * TODO : Add the remaining peripherals and the regiters
+*/
 /*Base  addresses of FLASH and SRAM*/
 #define FLASH_BASEADDR 			0x08000000U
 #define SRAM1_BASEADDR  		0x20000000U
@@ -34,7 +78,7 @@
  * Base address of the Peripherals hanging on AHB1
  * 1. GPIOx Base addresses
  * TODO : Add the remaining peripherals
- * */
+*/
 /*GPIO BASE addresses*/
 #define GPIOA_BASEADDR			(AHB1PERI_BASEADDR + 0x0000)
 #define GPIOB_BASEADDR			(AHB1PERI_BASEADDR + 0x0400)
@@ -55,7 +99,7 @@
  * 3. USART
  * 4. UART
  * TODO : Add the remaining peripherals
- * */
+*/
 #define I2C1_BASEADDR			(APB1PERI_BASEADDR + 0x5400)
 #define I2C2_BASEADDR			(APB1PERI_BASEADDR + 0x5800)
 #define I2C3_BASEADDR			(APB1PERI_BASEADDR + 0x5C00)
@@ -76,7 +120,7 @@
  * 3. SYS_Cofiguration
  * 4. EXTI
  * TODO : Add the remaining peripherals
- * */
+*/
 #define USART1_BASEADDR 		(APB2PERI_BASEADDR + 0x1000)
 #define USART6_BASEADDR 		(APB2PERI_BASEADDR + 0x1400)
 
@@ -91,8 +135,11 @@
  * Structs definations of peripheral registers
  * 1. GPIOx
  * 2. RCCx
- */
-/******************* Peripherals Register Structures*******************/
+ * 3. EXTIx
+*/
+
+
+/******************* GPIOx Register Structure*******************/
 typedef struct
 {
 	volatile uint32_t MODER;
@@ -108,6 +155,7 @@ typedef struct
 }GPIO_RegDef_t;
 
 
+/******************* RCC Register Structure*******************/
 typedef struct
 {
 	volatile uint32_t CR;
@@ -142,9 +190,35 @@ typedef struct
 
 }RCC_RegDef_t;
 
+/******************* EXTI Register Structure*******************/
+typedef struct
+{
+
+	volatile uint32_t IMR;
+	volatile uint32_t EMR;
+	volatile uint32_t RTSR;
+	volatile uint32_t FTSR;
+	volatile uint32_t SWIER;
+	volatile uint32_t PR;
+}EXTI_RegDef_t;
+
+/******************* SYSCONFIG Register Structure*******************/
+typedef struct 
+{
+	volatile uint32_t MEMRMP;
+	volatile uint32_t PMC;
+	volatile uint32_t EXTICR[4];
+	uint32_t Reserved[2];
+	volatile uint32_t CMPCR;
+
+}SYSCFG_RegDef_t;
+
 /*
  * Defining Macros as base address of structures
  * 1. ALL GPIOx Register Structure Macros
+ * 2. RCCx Registers
+ * 3. EXTI Registers
+ * 4. SysConfig Registers
  */
 
 /******************** GPIOx RegDef_t Address Pointer ************************/
@@ -158,17 +232,24 @@ typedef struct
 #define GPIOH 		((GPIO_RegDef_t*)GPIOH_BASEADDR )
 #define GPIOI 		((GPIO_RegDef_t*)GPIOI_BASEADDR )
 
-/******************* RCC RegDef_t Addresses Pointers *************************/
+/******************* RCC RegDef_t Addresses Pointer *************************/
 #define RCC 		((RCC_RegDef_t*)RCC_BASEADDR )
+
+/******************* EXTI RegDef_t Addresses Pointers *************************/
+#define EXTI        ((EXTI_RegDef_t*)EXTI_BASEADDR)
+
+/******************* SYSCONFG RegDef_t Addresses Pointer *************************/
+#define SYSCONFIG   ((SYSCFG_RegDef_t*)SYSCONF_BASEADDR)
 
 
 /*
  * Defining the Macros to enable peripheral clock
- * 1. GPIOx AHB1
- * 2. I2C APB1
- * 3. SPI APB1
- * 4. USART APB1
- * 5. UART  APB1
+ * 1. GPIOx 
+ * 2. I2C 
+ * 3. SPI
+ * 4. USART 
+ * 5. UART  
+ * 6. SYSCONFIG 
  */
 
 /******************* GPIO Peripheral Clock Enable  ***************************/
@@ -209,11 +290,11 @@ typedef struct
 
 /*
  * Defining the Macros to disable peripheral clock
- * 1. GPIOx AHB1
- * 2. I2C APB1
- * 3. SPI APB1
- * 4. USART APB1
- * 5. UART  APB1
+ * 1. GPIOx 
+ * 2. I2C 
+ * 3. SPI 
+ * 4. USART
+ * 5. UART
  */
 
 /******************* GPIO Peripheral Clock Enable  ***************************/
@@ -251,10 +332,12 @@ typedef struct
 #define SYSCFG_PCLK_DI()	(RCC->APB2ENR &= ~(1 << 14))
 
 /*
- * Defining the Macros to reset the GPIO port
+ * Defining the Macros to reset Peripherals
  * 1. GPIOx AHB1
- */
+ 
+*/
 
+/**************************** GPIO Reset Peripheral ******************************/
 #define GPIOA_RESET()		do{RCC->AHB1RSTR |= ~(1<<0); RCC->AHB1RSTR &= ~(1<<0);}while(0)
 #define GPIOB_RESET()		do{RCC->AHB1RSTR |= ~(1<<1); RCC->AHB1RSTR &= ~(1<<1);}while(0)
 #define GPIOC_RESET()		do{RCC->AHB1RSTR |= ~(1<<2); RCC->AHB1RSTR &= ~(1<<2);}while(0)
@@ -265,15 +348,43 @@ typedef struct
 #define GPIOH_RESET()		do{RCC->AHB1RSTR |= ~(1<<7); RCC->AHB1RSTR &= ~(1<<7);}while(0)
 #define GPIOI_RESET()		do{RCC->AHB1RSTR |= ~(1<<8); RCC->AHB1RSTR &= ~(1<<8);}while(0)
 
+
+
 /*
  * Generic global Macros are defined here
  * 1. GPIOx
- */
+ * 2. GPIOx Port Code
+ * 3. IRQ Numbers
+*/
 
+
+/**************************** GPIO General Macros ******************************/
 #define EN 					1
 #define DIS					0
 #define SET					EN
 #define RESET				DIS
+
+/**************************** GPIO Port Code General Macros ********************/
+#define GPIOPORTCODE(x) ( \
+    /* 0000: PA[x] pin */ 	(x ==GPIOA) ? 0 : \
+    /* 0001: PB[x] pin */ 	(x ==GPIOB) ? 1 : \
+    /* 0010: PC[x] pin */ 	(x ==GPIOC) ? 2 : \
+    /* 0011: PD[x] pin */ 	(x ==GPIOD) ? 3 : \
+    /* 0100: PE[x] pin */ 	(x ==GPIOE) ? 4 : \
+    /* 0101: PF[x] pin */ 	(x ==GPIOF) ? 5 : \
+    /* 0110: PG[x] pin */ 	(x ==GPIOG) ? 6 : \
+    /* 0111: PH[x] pin */ 	(x ==GPIOH) ? 7 : \
+    /* 1000: PI[x] pin */ 	(x ==GPIOI) ? 8 : 0 \
+)
+
+/**************************** EXTIx IRQNumbers Macros ********************/
+#define IRQNUMBER_EXTI0 		6
+#define IRQNUMBER_EXTI1			7
+#define IRQNUMBER_EXTI2			8
+#define IRQNUMBER_EXTI3			9
+#define IRQNUMBER_EXTI4			10
+#define IRQNUMBER_EXTI9_5		23
+#define IRQNUMBER_EXTI15_10		40
 
 
 
