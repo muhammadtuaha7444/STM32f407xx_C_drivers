@@ -105,7 +105,7 @@ void GPIO_Init(GPIO_Handler_t *pGPIO_Handle)
 		temp = 0;
 
 
-	}else if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode >> GPIO_AN_MODE) // GPIO Interrupt Logic is here
+	}else if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode > GPIO_AN_MODE) // GPIO Interrupt Logic is here
 	{
 		//1. Configure the edge trigger
 		if(pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode == GPIO_IT_FE)

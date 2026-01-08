@@ -38,14 +38,13 @@ int main()
 
     GPIO_Init(&GpioButt);
 
-    GpioButt.pGPIOx_Port = GPIOD;
-
-    GpioButt.pGPIOxConfig_Port.GPIO_PinNumber = GPIO_PIN12;
-    GpioButt.pGPIOxConfig_Port.GPIO_PinMode = GPIO_OP_MODE; 
-    GpioButt.pGPIOxConfig_Port.GPIO_PinSpeed  = GPIO_OP_SPEEDHIGH;
-    GpioButt.pGPIOxConfig_Port.GPIO_PinPUPD = GPIO_NO_PUPD;
-    GpioButt.pGPIOxConfig_Port.GPIO_PinODType = GPIO_OT_PP;
-    GpioButt.pGPIOxConfig_Port.GPIO_PinAF = 0 ;
+    GpioLed.pGPIOx_Port = GPIOD;
+    GpioLed.pGPIOxConfig_Port.GPIO_PinNumber = GPIO_PIN12;
+    GpioLed.pGPIOxConfig_Port.GPIO_PinMode = GPIO_OP_MODE; 
+    GpioLed.pGPIOxConfig_Port.GPIO_PinSpeed  = GPIO_OP_SPEEDHIGH;
+    GpioLed.pGPIOxConfig_Port.GPIO_PinPUPD = GPIO_NO_PUPD;
+    GpioLed.pGPIOxConfig_Port.GPIO_PinODType = GPIO_OT_PP;
+    GpioLed.pGPIOxConfig_Port.GPIO_PinAF = 0 ;
 
     GPIO_Init(&GpioLed);
 
