@@ -11,7 +11,11 @@
 #include <stdint.h>
 #include "stm32f407xx.h"
 
-
+/*
+ * GPIO typedefination
+ * 1. GPIOx Pin Configuration struct
+ * 2. GPIO Handler Struct
+ */
 
 /*
  * Here we have defined a structure to for a GPIO pin configuration

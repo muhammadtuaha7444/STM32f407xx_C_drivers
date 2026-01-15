@@ -136,6 +136,8 @@
  * 1. GPIOx
  * 2. RCCx
  * 3. EXTIx
+ * 4. SYSCFGx
+ * 5. SPIx
 */
 
 
@@ -213,12 +215,30 @@ typedef struct
 
 }SYSCFG_RegDef_t;
 
+/******************* SPI Register Structure*******************/
+typedef struct
+{
+	volatile uint32_t SPI_CR1;
+	volatile uint32_t SPI_CR2;
+	volatile uint32_t  SPI_SR;
+	volatile uint32_t  SPI_DR;
+	volatile uint32_t SPI_CRCPR;
+	volatile uint32_t SPI_RXCRCR;
+	volatile uint32_t SPI_TXCRCR;
+	volatile uint32_t SPI_I2SCFGR;
+	volatile uint32_t SPI_I2SPR;
+
+}SPI_RegDef_t;
+
+
+
 /*
  * Defining Macros as base address of structures
  * 1. ALL GPIOx Register Structure Macros
- * 2. RCCx Registers
- * 3. EXTI Registers
- * 4. SysConfig Registers
+ * 2. RCCx Registers Macros
+ * 3. EXTI Registers Macros
+ * 4. SysConfig Registers Macros
+ * 5. SPIx Register Macros
  */
 
 /******************** GPIOx RegDef_t Address Pointer ************************/
@@ -241,6 +261,12 @@ typedef struct
 /******************* SYSCONFG RegDef_t Addresses Pointer *************************/
 #define SYSCONFIG   ((SYSCFG_RegDef_t*)SYSCONF_BASEADDR)
 
+/******************* SPI Addresses Pointer *************************/
+#define SPI1		((SPI_RegDef_t*)SPI1_BASEADDR)
+#define SPI2		((SPI_RegDef_t*)SPI2_BASEADDR)
+#define SPI3		((SPI_RegDef_t*)SPI3_BASEADDR)
+#define SPI4		((SPI_RegDef_t*)SPI4_BASEADDR)
+
 
 /*
  * Defining the Macros to enable peripheral clock
@@ -250,6 +276,7 @@ typedef struct
  * 4. USART 
  * 5. UART  
  * 6. SYSCONFIG 
+ * 7. SPIx
  */
 
 /******************* GPIO Peripheral Clock Enable  ***************************/
@@ -270,6 +297,7 @@ typedef struct
 
 /*************************** SPI Clock Enable **********************************/
 #define SPI1_PCLK_EN()		(RCC->APB2ENR |= (1 << 12))
+#define SPI4_PCLK_EN()		(RCC->APB2ENR |= (1 << 13))
 #define SPI2_PCLK_EN()		(RCC->APB1ENR |= (1 << 14))
 #define SPI3_PCLK_EN()		(RCC->APB1ENR |= (1 << 15))
 
@@ -315,6 +343,7 @@ typedef struct
 
 /*************************** SPI Clock Enable **********************************/
 #define SPI1_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 12))
+#define SPI4_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 13))
 #define SPI2_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 14))
 #define SPI3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 15))
 
