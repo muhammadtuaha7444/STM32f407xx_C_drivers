@@ -5,7 +5,6 @@
  *      Author: Muhammad Tuaha Yasin
  */
 
-#include "stm32f407xx.h"
 #include "stm32f407xx_driver_gpio.h"
 
 

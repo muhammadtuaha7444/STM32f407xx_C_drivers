@@ -96,7 +96,7 @@ typedef struct
 
 
 /********************************************************************************
- * 						GPIO APIs are written here
+ * 						GPIO APIs Decarations are written here
  *******************************************************************************/
 void GPIO_ClockCtrl(GPIO_RegDef_t *GPIOx, uint8_t EnDis);
 void GPIO_Init(GPIO_Handler_t *GPIOx);
