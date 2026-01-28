@@ -63,9 +63,11 @@ void SPI_ClockCtrl(SPI_RegDef_t* pSPIx, uint8_t EnDis)
  */
 void SPI_Init(SPI_Handler_t *pSPIHandler)
 {
+
+    SPI_ClockCtrl(pSPIHandler->pSPI_reg, EN);
     //1. Configure the SPI Device Mode
     uint32_t temp = 0; 
-    temp|= (pSPIHandler->SPI_config.SPI_DeviceMode) << (MSTR_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_DeviceMode) << (SPI_MSTR_BIT);
     
 
     //2. Configure the Bus Speed
@@ -83,15 +85,15 @@ void SPI_Init(SPI_Handler_t *pSPIHandler)
     }
 
     //3. Configure the Baud Rate
-    temp|= (pSPIHandler->SPI_config.SPI_Speed) << (SPE_BR_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_Speed) << (SPI_SPE_BR_BIT);
     //4. Confgiure the SPI data frame
-    temp|= (pSPIHandler->SPI_config.SPI_DFF)   << (DFF_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_DFF)   << (SPI_DFF_BIT);
     //5. Configure the CPHA 
-    temp|= (pSPIHandler->SPI_config.SPI_CPHA)  << (DFF_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_CPHA)  << (SPI_DFF_BIT);
     //6. Configure the CPOL
-    temp|= (pSPIHandler->SPI_config.SPI_CPOL)  << (CPOL_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_CPOL)  << (SPI_CPOL_BIT);
     //7. COnfigure the SSM
-    temp|= (pSPIHandler->SPI_config.SPI_SSM)   << (SSM_BIT);
+    temp|= (pSPIHandler->SPI_config.SPI_SSM)   << (SPI_SSM_BIT);
 
     pSPIHandler->pSPI_reg->SPI_CR1 = temp;
     
@@ -121,17 +123,74 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
 
 }
 
-/*******************************************************************************
- * @ Function : GPIO_Init
- * @ Brief    : This Function Configure the GPIO port using the GPIO handler
- * @ Para[1]  : Pointer to GPIO Handler Struct(GPIO base address)
- * @ Note	  :
- */
-uint8_t SPI_Tx(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len )
+uint8_t SPI_Status_Register_Status(SPI_RegDef_t *pSPIx, uint32_t FlagName)
 {
-
+    if(FlagName == SPI_TX_EMPTY_STATUS_FLAG)
+    {
+        if((pSPIx->SPI_SR) & SPI_TX_EMPTY_STATUS_FLAG)
+        {
+            return SPI_TX_EMPTY;
+        }else
+        {
+            return SPI_TX_NON_EMPTY;
+        }
+    }
 }
 
+/*******************************************************************************
+ * @ Function : SPI_Tx
+ * @ Brief    : This Function Sends the data on SPI In blocking or polling mode
+ * @ Para[1]  : SPI 
+ * @ Para[2]  : Pointer to data buffer
+ * @ Para[3]  : Length of the data to be send
+ * @ Note	  :
+ */
+void SPI_Tx(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len )
+{
+
+    while(Len > 0)
+    {
+        //1. Check if the TX buffer is empty or not.
+        while(SPI_Status_Register_Status(pSPIx, SPI_TX_EMPTY_STATUS_FLAG ) == SPI_TX_NON_EMPTY );
+
+        //2. check the for the dataframe
+        if(((pSPIx->SPI_CR1) & (1 << SPI_DFF_BIT)))
+        {
+            //3. Transfer the 16 bit frame
+            pSPIx->SPI_DR = (*((uint16_t*)pTxBuffer));
+            Len--;
+            Len--;
+            (uint16_t*)pTxBuffer++;
+        }else
+        {
+            //3. Transfer the 8 bit frame
+            pSPIx->SPI_DR = *(pTxBuffer);
+            Len--;
+            pTxBuffer++;
+            
+        }
+
+    }
+}
+
+/*******************************************************************************
+ * @ Function : SPI_Control
+ * @ Brief    : This Function Enables or Disables the SPI using the SPE bit
+ * @ Para[1]  : Pointer to GPIO Handler Struct(GPIO base address)
+ * @ Para[2]  : Enable or Disable Macro 
+ * @ Note	  :
+ */
+void SPI_Control(SPI_Handler_t *pSPIx, uint8_t ENorDIS)
+{
+    if(ENorDIS == EN)
+    {
+        pSPIx->pSPI_reg->SPI_CR1 |= (1 << SPI_SPE_BIT);
+    }else
+    {
+        pSPIx->pSPI_reg->SPI_CR1 &= ~(1 << SPI_SPE_BIT);
+    }
+
+}
 /*******************************************************************************
  * @ Function : GPIO_Init
  * @ Brief    : This Function Configure the GPIO port using the GPIO handler

@@ -94,6 +94,8 @@ void GPIO_ClockCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnDis)
  */
 void GPIO_Init(GPIO_Handler_t *pGPIO_Handle)
 {
+
+	GPIO_ClockCtrl(pGPIO_Handle->pGPIOx_Port, EN);
 	uint32_t temp = 0;
 	/* GPIOx Mode Configuration of the port*/
 	if (pGPIO_Handle->pGPIOxConfig_Port.GPIO_PinMode <= GPIO_AN_MODE)

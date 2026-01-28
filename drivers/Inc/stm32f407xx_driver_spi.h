@@ -103,21 +103,38 @@ typedef struct
 #define SPI_BAUD_RATE_256         7         //0111: fPCLK/256
 
 /* 2. SPI Control Register 1 Bit Place Defination */
-#define SPI_BIDI_MODE_BIT         15
-#define SPI_BIDI_OE_BIT           14
-#define SPI_CRC_EN_BIT            13
-#define CRC_NEXT_BIT              12
-#define DFF_BIT                   11
-#define RX_ONLY_BIT               10
-#define SSM_BIT                   9
-#define SSI_BIT                   8
-#define LSB_FIRST_BIT             7
-#define SPE_BIT                   6
-#define SPE_BR_BIT                3
-#define MSTR_BIT                  2
-#define CPOL_BIT                  1
-#define CPHA_BIT                  0
+#define SPI_BIDI_MODE_BIT             15
+#define SPI_BIDI_OE_BIT               14
+#define SPI_CRC_EN_BIT                13
+#define SPI_CRC_NEXT_BIT              12
+#define SPI_DFF_BIT                   11
+#define SPI_RX_ONLY_BIT               10
+#define SPI_SSM_BIT                   9
+#define SPI_SSI_BIT                   8
+#define SPI_LSB_FIRST_BIT             7
+#define SPI_SPE_BIT                   6
+#define SPI_SPE_BR_BIT                3
+#define SPI_MSTR_BIT                  2
+#define SPI_CPOL_BIT                  1
+#define SPI_CPHA_BIT                  0
 
+/* 3. SPI Status Register Bit Place Defination */
+#define SPI_RXNE                      0
+#define SPI_TXE                       1
+#define SPI_CHSIDE                    2
+#define SPI_UDR                       3
+#define SPI_CRC_ERR                   4
+#define SPI_MODF                      5
+#define SPI_OVR                       6
+#define SPI_BSY                       7
+#define SPI_FRE                       8
+
+/* 4. SPI Status Register Flag Bit Place Defination */
+#define SPI_TX_EMPTY_STATUS_FLAG      (1 << SPI_TXE)
+#define SPI_RXNE_N_EMPTY_FLAG         (1 << SPI_RXNE)
+#define SPI_BSY_FLAG                  (1 << SPI_BSY)
+#define SPI_TX_EMPTY                  1
+#define SPI_TX_NON_EMPTY              0
 /********************************************************************************
  * 						GPIO APIs Decarations are written here
  *******************************************************************************/
@@ -125,12 +142,13 @@ typedef struct
 void SPI_ClockCtrl(SPI_RegDef_t* pSPIx, uint8_t EnDis);
 void SPI_Init(SPI_Handler_t *pSPIHandler);
 void SPI_DeInit(SPI_RegDef_t *pSPIx);
-uint8_t SPI_Tx(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len );
+void SPI_Tx(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len );
 uint8_t SPI_Rx(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len );
 void SPI_IRQConfig(uint8_t IRQNumber, uint8_t EnDis);
 void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 void SPI_IRQHandler(SPI_RegDef_t *SPIx);
-
+uint8_t SPI_Status_Register_Status(SPI_RegDef_t *pSPIx, uint32_t FlagName);
+void SPI_Control(SPI_Handler_t *pSPIx, uint8_t ENorDIS);
 
 
 #endif /* INC_STM32F407XX_DRIVER_SPI_H_ */
